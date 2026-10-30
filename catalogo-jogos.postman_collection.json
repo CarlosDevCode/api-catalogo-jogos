@@ -1,0 +1,236 @@
+{
+  "info": {
+    "name": "Catálogo de Jogos - API REST",
+    "description": "Coleção para testar a API de catálogo de jogos (Node.js + Express). Execute com o servidor rodando em http://localhost:3000. Rode os requests em ordem (ou use o Collection Runner).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "jogoId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. GET /jogos - Listar todos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/jogos", "host": ["{{baseUrl}}"], "path": ["jogos"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('Retorna um array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. GET /jogos/1 - Consultar por ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/jogos/1", "host": ["{{baseUrl}}"], "path": ["jogos", "1"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('Retorna o jogo de id 1', () => pm.expect(pm.response.json().id).to.eql(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. GET /jogos/99 - ID inexistente (404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/jogos/99", "host": ["{{baseUrl}}"], "path": ["jogos", "99"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', () => pm.response.to.have.status(404));",
+              "pm.test('Mensagem em JSON', () => pm.expect(pm.response.json()).to.have.property('mensagem'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. POST /jogos - Cadastrar (201)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Hollow Knight\",\n  \"plataforma\": \"PC\",\n  \"genero\": \"Metroidvania\",\n  \"anoLancamento\": 2017\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/jogos", "host": ["{{baseUrl}}"], "path": ["jogos"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 201', () => pm.response.to.have.status(201));",
+              "const jogo = pm.response.json();",
+              "pm.test('Jogo criado com id', () => pm.expect(jogo).to.have.property('id'));",
+              "pm.collectionVariables.set('jogoId', jogo.id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. POST /jogos - Campos faltando (400)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Jogo Incompleto\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/jogos", "host": ["{{baseUrl}}"], "path": ["jogos"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. PUT /jogos/:id - Atualizar (200)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Hollow Knight: Edição Completa\",\n  \"plataforma\": \"Nintendo Switch\",\n  \"genero\": \"Metroidvania\",\n  \"anoLancamento\": 2018\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/jogos/{{jogoId}}", "host": ["{{baseUrl}}"], "path": ["jogos", "{{jogoId}}"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('Dados atualizados', () => {",
+              "  const j = pm.response.json();",
+              "  pm.expect(j.plataforma).to.eql('Nintendo Switch');",
+              "  pm.expect(j.anoLancamento).to.eql(2018);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. PUT /jogos/99 - ID inexistente (404)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"X\",\n  \"plataforma\": \"Y\",\n  \"genero\": \"Z\",\n  \"anoLancamento\": 2000\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{baseUrl}}/jogos/99", "host": ["{{baseUrl}}"], "path": ["jogos", "99"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. DELETE /jogos/:id - Remover (200)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/jogos/{{jogoId}}", "host": ["{{baseUrl}}"], "path": ["jogos", "{{jogoId}}"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "pm.test('Mensagem de sucesso', () => pm.expect(pm.response.json()).to.have.property('mensagem'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. DELETE /jogos/99 - ID inexistente (404)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/jogos/99", "host": ["{{baseUrl}}"], "path": ["jogos", "99"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. GET /rota-inexistente - Rota inexistente (404)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": { "raw": "{{baseUrl}}/rota-inexistente", "host": ["{{baseUrl}}"], "path": ["rota-inexistente"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 404', () => pm.response.to.have.status(404));",
+              "pm.test('Mensagem em JSON', () => pm.expect(pm.response.json().mensagem).to.eql('Rota não encontrada'));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 API REST desenvolvida com **Node.js** e **Express.js** para gerenciar um catálogo de jogos eletrônicos. Os dados ficam armazenados em memória (um array), sem uso de banco de dados.
 
-Projeto prático criado para praticar os fundamentos de APIs REST: rotas, métodos HTTP, status codes, validações, middlewares e organização de código.
+Projeto prático desenvolvido durante o curso de Análise de Desenvolvimento de Sistemas para a disciplina de Programação WEB (Back-end) criado para praticar os fundamentos de APIs REST: rotas, métodos HTTP, status codes, validações, middlewares e organização de código.
 
 ## 🚀 Tecnologias
 
